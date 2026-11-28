@@ -191,6 +191,7 @@ export {
   Newsletter,
   NotFound,
 } from "./marketing-sections.js";
+export type { ComparisonValue } from "./marketing-sections.js";
 export {
   DocsShell,
   SearchTrigger,
