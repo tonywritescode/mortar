@@ -327,7 +327,7 @@ export function buildPacket(data, { components: names = [], brief } = {}) {
     themeProvider: {
       code: THEME_SETUP,
       notes:
-        "Render one ThemeProvider at the app root. brand (neutral | green, or your own via brandTokens) and density (compact | comfortable | spacious) are controlled props; appearance changes through AppearanceControl. Pass navigate={(href) => router.push(href)} to route kit links through your router.",
+        "Render one ThemeProvider at the app root. brand (neutral | green, or your own via brandTokens) and density (compact | comfortable | spacious) are controlled props; appearance changes through AppearanceControl. Give each product its own look, not only its own colours: choose brand colours and fonts, a shape (square | soft | round | pill) and a surface (bordered | raised | flat) that suit it, in brandTokens or as ThemeProvider props (get_guide theming). Pass navigate={(href) => router.push(href)} to route kit links through your router.",
     },
     import: importLine(data, ["ThemeProvider", ...requested]),
     components: selection.map((c) => ({

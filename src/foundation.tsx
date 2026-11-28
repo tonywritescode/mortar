@@ -8,7 +8,15 @@ import {
   type OverlayPortal,
 } from "./internal.js";
 import { Portal } from "@headlessui/react";
-import { brandToCss, type BrandDefinition } from "./brand.js";
+import {
+  SHAPES,
+  SURFACES,
+  brandOption,
+  brandToCss,
+  type BrandDefinition,
+  type Shape,
+  type Surface,
+} from "./brand.js";
 import {
   createContext,
   useContext,
@@ -20,7 +28,7 @@ import {
   type ReactNode,
 } from "react";
 
-export type { OverlayPortal };
+export type { OverlayPortal, Shape, Surface };
 
 export type Appearance = "light" | "dark" | "system";
 /**
@@ -34,6 +42,8 @@ type Theme = {
   setAppearance: (value: Appearance) => void;
   brand: Brand;
   density: Density;
+  shape: Shape;
+  surface: Surface;
 };
 const ThemeContext = createContext<Theme | null>(null);
 export interface ThemeProviderProps {
@@ -52,6 +62,17 @@ export interface ThemeProviderProps {
    */
   brandTokens?: BrandDefinition;
   density?: Density;
+  /**
+   * Corner shape: `square`, `soft` (default), `round` or `pill`. Defaults to
+   * `brandTokens.shape`. Written as `data-mortar-shape`.
+   */
+  shape?: Shape;
+  /**
+   * How content cards stand off the page: `bordered` (default), `raised` or
+   * `flat`. Defaults to `brandTokens.surface`. Written as
+   * `data-mortar-surface`.
+   */
+  surface?: Surface;
   /**
    * document writes the root element. container paints a wrapper and leaves
    * the document unchanged; menus, listboxes and dialogs opened inside it keep
@@ -110,9 +131,25 @@ export function ThemeProvider({
   brand = "neutral",
   brandTokens,
   density = "comfortable",
+  shape: shapeProp,
+  surface: surfaceProp,
   scope = "document",
   className,
 }: ThemeProviderProps) {
+  // Validated like brand colours: a value from tenant data that isn't a
+  // preset throws instead of silently falling back.
+  const shape = brandOption(
+    "shape",
+    shapeProp ?? brandTokens?.shape,
+    SHAPES,
+    "soft",
+  );
+  const surface = brandOption(
+    "surface",
+    surfaceProp ?? brandTokens?.surface,
+    SURFACES,
+    "bordered",
+  );
   const [localAppearance, setLocalAppearance] =
     useState<Appearance>(initialAppearance);
   const appearance = controlledAppearance ?? localAppearance;
@@ -129,6 +166,8 @@ export function ThemeProvider({
     "data-mortar": "",
     "data-mortar-brand": brand,
     "data-mortar-density": density,
+    "data-mortar-shape": shape,
+    "data-mortar-surface": surface,
     "data-mortar-appearance": resolvedAppearance,
   };
   const host = usePortalHost(scope === "container", attributes);
@@ -141,6 +180,8 @@ export function ThemeProvider({
       "data-mortar": "",
       "data-mortar-brand": brand,
       "data-mortar-density": density,
+      "data-mortar-shape": shape,
+      "data-mortar-surface": surface,
     };
     const previous = Object.keys(attributes).map(
       (key) => [key, element.getAttribute(key)] as const,
@@ -153,7 +194,7 @@ export function ThemeProvider({
           ? element.removeAttribute(key)
           : element.setAttribute(key, value);
     };
-  }, [brand, density, scope]);
+  }, [brand, density, shape, surface, scope]);
   useEffect(() => {
     if (scope !== "document") return;
     const element = document.documentElement;
@@ -176,7 +217,7 @@ export function ThemeProvider({
         <style data-mortar-brand-style={brand}>{brandCss}</style>
       )}
       <ThemeContext.Provider
-        value={{ appearance, setAppearance, brand, density }}
+        value={{ appearance, setAppearance, brand, density, shape, surface }}
       >
         {children}
       </ThemeContext.Provider>
