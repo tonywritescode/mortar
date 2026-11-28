@@ -52,11 +52,54 @@ export interface BrandFonts {
   heading?: string;
 }
 
+/**
+ * Corner shape, as a preset radius scale. `soft` is the default. `square` has
+ * no rounding, `round` doubles it on large surfaces, and `pill` is `round`
+ * with fully rounded buttons, fields and segmented controls.
+ */
+export type Shape = "square" | "soft" | "round" | "pill";
+/**
+ * How content cards stand off the page. `bordered` is the default: a line on
+ * the surface colour. `raised` adds a soft shadow; `flat` drops the line and
+ * fills with the recessed colour. Dialogs, menus and toasts are unaffected.
+ */
+export type Surface = "bordered" | "raised" | "flat";
+export const SHAPES: readonly Shape[] = ["square", "soft", "round", "pill"];
+export const SURFACES: readonly Surface[] = ["bordered", "raised", "flat"];
+
 /** A brand's light and dark values. Inverse bands use the other appearance's. */
 export interface BrandDefinition {
   light?: BrandAppearanceTokens;
   dark?: BrandAppearanceTokens;
   fonts?: BrandFonts;
+  /**
+   * Corner shape. Applied by ThemeProvider (`data-mortar-shape`); its `shape`
+   * prop wins over this.
+   */
+  shape?: Shape;
+  /**
+   * Card surface style. Applied by ThemeProvider (`data-mortar-surface`); its
+   * `surface` prop wins over this.
+   */
+  surface?: Surface;
+}
+
+/** The value if it is one of the options, else a descriptive error. */
+export function brandOption<T extends string>(
+  field: string,
+  value: unknown,
+  options: readonly T[],
+  fallback: T,
+): T {
+  if (value === undefined) return fallback;
+  if (
+    typeof value === "string" &&
+    (options as readonly string[]).includes(value)
+  )
+    return value as T;
+  throw new Error(
+    `Invalid Mortar ${field}: "${String(value)}". Use ${options.map((o) => `"${o}"`).join(", ")}.`,
+  );
 }
 
 const KEYS: Record<keyof BrandAppearanceTokens, string> = {

@@ -22,6 +22,7 @@ import {
   PageHeading,
   Section,
   SegmentedControl,
+  Select,
   Table,
   Tabs,
   ThemeProvider,
@@ -34,6 +35,8 @@ import {
   type BrandAppearanceTokens,
   type BrandDefinition,
   type BrandFonts,
+  type Shape,
+  type Surface,
 } from "../src/brand.js";
 import { Check, Close } from "../src/icons.js";
 import { isBrandParam } from "./explorer.js";
@@ -43,7 +46,20 @@ type Mode = "light" | "dark";
 type FontKey = keyof BrandFonts;
 type Values = Record<Mode, Partial<Record<Key, string>>> & {
   fonts?: Partial<Record<FontKey, string>>;
+  shape?: Shape;
+  surface?: Surface;
 };
+const SHAPE_CHOICES: { value: Shape; label: string }[] = [
+  { value: "soft", label: "Soft (default)" },
+  { value: "square", label: "Square" },
+  { value: "round", label: "Round" },
+  { value: "pill", label: "Pill" },
+];
+const SURFACE_CHOICES: { value: Surface; label: string }[] = [
+  { value: "bordered", label: "Bordered (default)" },
+  { value: "raised", label: "Raised" },
+  { value: "flat", label: "Flat" },
+];
 
 interface Field {
   key: Key;
@@ -318,6 +334,20 @@ function readUrl(): { name: string; values: Values } {
       any = true;
     }
   }
+  const shape = SHAPE_CHOICES.find(
+    (c) => c.value === params.get("brand-shape"),
+  );
+  const surface = SURFACE_CHOICES.find(
+    (c) => c.value === params.get("brand-surface"),
+  );
+  if (shape && shape.value !== "soft") {
+    values.shape = shape.value;
+    any = true;
+  }
+  if (surface && surface.value !== "bordered") {
+    values.surface = surface.value;
+    any = true;
+  }
   const name = params.get("name");
   // A first visit starts from the blue preset; a shared link keeps exactly what it lists.
   if (!any && name === null)
@@ -338,6 +368,8 @@ function writeUrl(name: string, values: Values) {
     const value = values.fonts?.[font.key];
     if (value) params.set(font.css, value);
   }
+  if (values.shape) params.set("brand-shape", values.shape);
+  if (values.surface) params.set("brand-surface", values.surface);
   const href = `?${params}`;
   if (href !== location.search) history.replaceState(null, "", href);
 }
@@ -345,6 +377,8 @@ const clone = (values: Values): Values => ({
   light: { ...values.light },
   dark: { ...values.dark },
   fonts: { ...values.fonts },
+  ...(values.shape && { shape: values.shape }),
+  ...(values.surface && { surface: values.surface }),
 });
 
 /** Why a value is rejected, or undefined when it is usable. */
@@ -1023,10 +1057,19 @@ export function BrandBuilder() {
     const value = values.fonts?.[font.key]?.trim();
     if (value && !errors[font.css]) (tokens.fonts ??= {})[font.key] = value;
   }
+  if (values.shape) tokens.shape = values.shape;
+  if (values.surface) tokens.surface = values.surface;
   const nameProblem = nameError(name);
   const brandName = nameProblem ? DEFAULT_NAME : name;
   const previewBrand = brandName;
   const css = brandToCss(brandName, tokens);
+  // Brand CSS carries colours and fonts; ThemeProvider takes the shape and surface.
+  const look = [
+    values.shape && ` shape="${values.shape}"`,
+    values.surface && ` surface="${values.surface}"`,
+  ]
+    .filter(Boolean)
+    .join("");
   const json = JSON.stringify(tokens, null, 2);
   const preset =
     PRESETS.find(
@@ -1063,6 +1106,15 @@ export function BrandBuilder() {
       ...current,
       [mode]: { ...current[mode], [key]: value },
     }));
+  // The defaults are left out, so tokens and links stay minimal.
+  const updateShape = (value: string) =>
+    setValues(({ shape: _, ...rest }) =>
+      value === "soft" ? rest : { ...rest, shape: value as Shape },
+    );
+  const updateSurface = (value: string) =>
+    setValues(({ surface: _, ...rest }) =>
+      value === "bordered" ? rest : { ...rest, surface: value as Surface },
+    );
   const updateFont = (key: FontKey, value: string) =>
     setValues((current) => ({
       ...current,
@@ -1268,6 +1320,25 @@ export function BrandBuilder() {
             ))}
           </div>
         </Fieldset>
+        <Fieldset
+          legend="Shape and surface"
+          description="The brand's silhouette: corner shape, and how cards stand off the page. Applied by ThemeProvider from brandTokens; brand CSS carries colours and fonts only."
+        >
+          <div className="pg-brand-pair">
+            <Select
+              label="Shape"
+              value={values.shape ?? "soft"}
+              options={SHAPE_CHOICES}
+              onChange={(e) => updateShape(e.target.value)}
+            />
+            <Select
+              label="Surface"
+              value={values.surface ?? "bordered"}
+              options={SURFACE_CHOICES}
+              onChange={(e) => updateSurface(e.target.value)}
+            />
+          </div>
+        </Fieldset>
       </section>
       <section className="pg-brand-section" aria-labelledby="brand-preview">
         <h2 id="brand-preview">Preview</h2>
@@ -1321,7 +1392,7 @@ export function BrandBuilder() {
         </p>
         <CodeBlock
           label="Usage"
-          code={`import "./brand.css"; // the CSS above\n<ThemeProvider brand="${brandName}">…</ThemeProvider>\n\n// or at runtime, from data:\n<ThemeProvider brand="${brandName}" brandTokens={tokens}>…</ThemeProvider>`}
+          code={`import "./brand.css"; // the CSS above\n<ThemeProvider brand="${brandName}"${look}>…</ThemeProvider>\n\n// or at runtime, from data (shape and surface included):\n<ThemeProvider brand="${brandName}" brandTokens={tokens}>…</ThemeProvider>`}
         />
       </section>
     </div>
@@ -1340,5 +1411,7 @@ function trimmed(values: Values): Values {
     const value = values.fonts?.[font.key]?.trim();
     if (value) out.fonts![font.key] = value;
   }
+  if (values.shape) out.shape = values.shape;
+  if (values.surface) out.surface = values.surface;
   return out;
 }

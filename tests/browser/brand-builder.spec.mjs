@@ -460,3 +460,37 @@ test("brand text colours restyle the previews and join the contrast table", asyn
   await expect(cssOutput(page)).toContainText("--m-brand-d-ink: #f7efdf;");
   expect(errors).toEqual([]);
 });
+
+test("shape and surface reach the previews, the output and the URL", async ({
+  page,
+}) => {
+  const errors = await open(page);
+  await page.getByLabel("Shape", { exact: true }).selectOption("pill");
+  await page.getByLabel("Surface", { exact: true }).selectOption("raised");
+  for (const mode of ["light", "dark"]) {
+    const wrapper = page.locator(".pg-brand-sample").filter({
+      has: sample(page, mode),
+    });
+    await expect(wrapper).toHaveAttribute("data-mortar-shape", "pill");
+    await expect(wrapper).toHaveAttribute("data-mortar-surface", "raised");
+    expect(
+      await save(page, mode).evaluate(
+        (el) => getComputedStyle(el).borderTopLeftRadius,
+      ),
+    ).toBe("999px");
+  }
+  await expect(page).toHaveURL(/brand-shape=pill/);
+  await expect(page).toHaveURL(/brand-surface=raised/);
+  await expect(
+    page.getByRole("figure", { name: "brandTokens (JSON)", exact: true }),
+  ).toContainText('"shape": "pill"');
+  // Brand CSS stays colours and fonts; the usage names the props.
+  await expect(cssOutput(page)).not.toContainText("pill");
+  await expect(page.getByText('shape="pill" surface="raised"')).toBeVisible();
+  // A shared link restores them; the defaults leave the URL.
+  await page.reload();
+  await expect(page.getByLabel("Shape", { exact: true })).toHaveValue("pill");
+  await page.getByLabel("Shape", { exact: true }).selectOption("soft");
+  await expect(page).not.toHaveURL(/brand-shape/);
+  expect(errors).toEqual([]);
+});

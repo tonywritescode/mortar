@@ -236,26 +236,31 @@
   ):hover {
     background: var(--m-sunken);
   }
-  /* Card surface: bordered, large radius, surface background. */
+  /* Floating surfaces: bordered, large radius, surface background. */
+  :where(.m-dialog-panel, .m-toast, .m-palette, .m-flyout-panel) {
+    border: 1px solid var(--m-line);
+    border-radius: var(--m-radius-lg);
+    background: var(--m-surface);
+  }
+  /* Content cards. The brand's surface style (ThemeProvider surface, see
+     tokens.css) sets --m-card-border, --m-card-fill and --m-card-shadow;
+     without one they are bordered on the surface colour. */
   :where(
-    .m-dialog-panel,
     .m-metrics,
     .m-data-table,
-    .m-toast,
-    .m-palette,
     .m-stacked-list,
     .m-card,
     .m-action-panel,
     .m-grid-list > li,
-    .m-flyout-panel,
     .m-order,
     .m-calendar-timegrid,
     .m-product-list[data-variant="cards"] > li,
     .m-mock-window
   ) {
-    border: 1px solid var(--m-line);
+    border: var(--m-card-border, 1px solid var(--m-line));
     border-radius: var(--m-radius-lg);
-    background: var(--m-surface);
+    background: var(--m-card-fill, var(--m-surface));
+    box-shadow: var(--m-card-shadow, none);
   }
   /* Titles keep their style at any heading level; h4–h6 lose the UA margins. */
   :where(
@@ -345,7 +350,7 @@
   ) {
     padding: 8px 12px;
     border: 0;
-    border-radius: var(--m-radius);
+    border-radius: var(--m-radius-control, var(--m-radius));
   }
   :is(
     .m-tabs[data-variant="pills"] [aria-selected="true"],
@@ -414,7 +419,7 @@
     min-height: var(--m-control);
     padding: 4px var(--m-pad);
     border: 1px solid transparent;
-    border-radius: var(--m-radius);
+    border-radius: var(--m-radius-control, var(--m-radius));
     font-size: var(--m-font-size);
     font-weight: var(--m-weight-semibold);
     line-height: 1.35;
@@ -548,7 +553,7 @@
     display: flex;
     align-items: stretch;
     border: 1px solid var(--m-line-strong);
-    border-radius: var(--m-radius);
+    border-radius: var(--m-radius-control, var(--m-radius));
     background: var(--m-surface);
     overflow: hidden;
   }
@@ -574,6 +579,10 @@
   }
   .m-field select {
     min-height: var(--m-control);
+  }
+  /* Textareas keep the surface radius: a pill-shaped box doesn't fit wrapped text. */
+  .m-field select {
+    border-radius: var(--m-radius-control, var(--m-radius));
   }
   .m-field select,
   .m-field textarea {
@@ -745,7 +754,7 @@
   .m-button-group {
     display: inline-flex;
     max-width: 100%;
-    border-radius: var(--m-radius);
+    border-radius: var(--m-radius-control, var(--m-radius));
   }
   .m-button-group > :is(button, a) {
     display: inline-flex;
@@ -766,12 +775,12 @@
   }
   .m-button-group > :first-child {
     margin-left: 0;
-    border-start-start-radius: var(--m-radius);
-    border-end-start-radius: var(--m-radius);
+    border-start-start-radius: var(--m-radius-control, var(--m-radius));
+    border-end-start-radius: var(--m-radius-control, var(--m-radius));
   }
   .m-button-group > :last-child {
-    border-start-end-radius: var(--m-radius);
-    border-end-end-radius: var(--m-radius);
+    border-start-end-radius: var(--m-radius-control, var(--m-radius));
+    border-end-end-radius: var(--m-radius-control, var(--m-radius));
   }
   .m-button-group-icon {
     display: inline-flex;
@@ -987,7 +996,7 @@
     min-height: var(--m-control);
     padding: 4px var(--m-pad);
     border: 1px solid var(--m-line-strong);
-    border-radius: var(--m-radius);
+    border-radius: var(--m-radius-control, var(--m-radius));
     background: var(--m-surface);
     color: var(--m-ink);
     font-size: var(--m-font-size);
@@ -1147,7 +1156,7 @@
     background: var(--m-sunken);
     padding: 3px;
     gap: 2px;
-    border-radius: var(--m-radius);
+    border-radius: var(--m-radius-control, var(--m-radius));
   }
   .m-segmented button {
     border: 1px solid transparent;
@@ -1155,7 +1164,10 @@
     color: var(--m-muted);
     font-size: 12px;
     font-weight: var(--m-weight-medium);
-    border-radius: 6px;
+    border-radius: max(
+      0px,
+      calc(var(--m-radius-control, var(--m-radius)) - 2px)
+    );
     padding: 5px 10px;
     cursor: pointer;
     min-height: max(28px, var(--m-touch-target));
@@ -1341,7 +1353,7 @@
   }
   .m-progress-track {
     height: 6px;
-    border-radius: 6px;
+    border-radius: calc(var(--m-radius) * 0.75);
     background: var(--m-sunken);
     overflow: hidden;
   }

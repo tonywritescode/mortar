@@ -65,7 +65,7 @@
     display: block;
     margin: 1px 0;
     padding: 5px 10px;
-    border-radius: 6px;
+    border-radius: calc(var(--m-radius) * 0.75);
     font-size: var(--m-font-size);
     color: var(--m-muted);
     text-decoration: none;
@@ -119,7 +119,7 @@
     min-height: 0;
     margin: 1px 0;
     padding: 5px 10px;
-    border-radius: 6px;
+    border-radius: calc(var(--m-radius) * 0.75);
     color: var(--m-muted);
     font-weight: var(--m-weight-regular);
   }
@@ -191,7 +191,7 @@
     min-height: calc(var(--m-control) - 4px);
     padding: 0 10px;
     border: 1px solid var(--m-line);
-    border-radius: var(--m-radius);
+    border-radius: var(--m-radius-control, var(--m-radius));
     background: var(--m-sunken);
     color: var(--m-muted);
     font-size: 13px;
@@ -317,7 +317,7 @@
     gap: 8px;
     min-height: 28px;
     padding: 0 10px;
-    border-radius: 6px;
+    border-radius: calc(var(--m-radius) * 0.75);
     color: var(--m-secondary);
   }
   .m-file-caret {
@@ -344,7 +344,7 @@
     margin: 0;
     min-width: 0;
     border: 1px solid var(--m-code-line);
-    border-radius: 10px;
+    border-radius: calc(var(--m-radius) * 1.25);
     background: var(--m-code-bg);
     color: var(--m-code-ink);
     overflow: hidden;
@@ -371,14 +371,14 @@
   }
   .m-code-bar [role="tab"] {
     padding: 4px 10px;
-    border-radius: 6px;
+    border-radius: calc(var(--m-radius) * 0.75);
     color: var(--m-code-dim);
     font: inherit;
     min-height: var(--m-touch-target);
   }
   .m-code-copy {
     padding: 4px 8px;
-    border-radius: 6px;
+    border-radius: calc(var(--m-radius) * 0.75);
     color: var(--m-code-dim);
     font: 12px var(--m-brand-font, var(--m-font));
     min-height: var(--m-touch-target);
@@ -458,8 +458,9 @@
   .m-api-endpoint {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    border: 1px solid var(--m-line);
+    border: var(--m-card-border, 1px solid var(--m-line));
     border-radius: var(--m-radius-lg);
+    box-shadow: var(--m-card-shadow, none);
     overflow: hidden;
   }
   .m-api-text {
@@ -527,7 +528,7 @@
   }
   .m-api-route [data-method] {
     padding: 2px 7px;
-    border-radius: 5px;
+    border-radius: calc(var(--m-radius) * 0.625);
     background: var(--m-primary);
     color: var(--m-on-primary);
     font-weight: var(--m-weight-semibold);
@@ -578,7 +579,7 @@
     min-height: max(28px, var(--m-touch-target));
     padding: 0 12px;
     border: 1px solid var(--m-line);
-    border-radius: 7px;
+    border-radius: calc(var(--m-radius) * 0.875);
     background: transparent;
     font-size: 13px;
     font-weight: var(--m-weight-medium);
@@ -601,8 +602,10 @@
   :is(.m-pager, .m-link-cards) a {
     display: block;
     padding: 14px 16px;
-    border: 1px solid var(--m-line);
-    border-radius: 10px;
+    border: var(--m-card-border, 1px solid var(--m-line));
+    border-radius: calc(var(--m-radius) * 1.25);
+    background: var(--m-card-fill, transparent);
+    box-shadow: var(--m-card-shadow, none);
     color: var(--m-ink);
     text-decoration: none;
   }
