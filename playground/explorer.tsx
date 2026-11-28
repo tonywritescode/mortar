@@ -59,9 +59,11 @@ export function url(key: string, value: string) {
   next.set(key, value);
   if (key === "state" && value === "default") next.delete("state");
   if (key === "view" && value === "preview") next.delete("view");
+  if (key === "shape" && value === "soft") next.delete("shape");
+  if (key === "surface" && value === "bordered") next.delete("surface");
   return `?${next}`;
 }
-/** Overview link that keeps appearance, brand and density. */
+/** Overview link that keeps appearance, brand, density, shape and surface. */
 export function homeHref() {
   const next = new URLSearchParams(location.search);
   clearPlaces(next);

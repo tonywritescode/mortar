@@ -34,6 +34,18 @@ const BrandBuilder = lazy(() =>
 const EmailPreview = lazy(() =>
   import("./email-preview.js").then((m) => ({ default: m.EmailPreview })),
 );
+const SHAPE_OPTIONS = ["soft", "square", "round", "pill"] as const;
+const SURFACE_OPTIONS = ["bordered", "raised", "flat"] as const;
+/** A URL value if it is one of the options, else the default. */
+function pick<T extends string>(
+  value: string | null,
+  options: readonly T[],
+  fallback: T,
+): T {
+  return (options as readonly string[]).includes(value ?? "")
+    ? (value as T)
+    : fallback;
+}
 const TOOLS = {
   brand: { label: "Brand builder", Page: BrandBuilder },
   email: { label: "Email preview", Page: EmailPreview },
@@ -176,6 +188,24 @@ function Playground({
                     { value: "spacious", label: "Spacious" },
                   ]}
                   onChange={(e) => navigate(url("density", e.target.value))}
+                />
+                <Select
+                  label="Shape"
+                  value={params.get("shape") || "soft"}
+                  options={SHAPE_OPTIONS.map((value) => ({
+                    value,
+                    label: value[0].toUpperCase() + value.slice(1),
+                  }))}
+                  onChange={(e) => navigate(url("shape", e.target.value))}
+                />
+                <Select
+                  label="Surface"
+                  value={params.get("surface") || "bordered"}
+                  options={SURFACE_OPTIONS.map((value) => ({
+                    value,
+                    label: value[0].toUpperCase() + value.slice(1),
+                  }))}
+                  onChange={(e) => navigate(url("surface", e.target.value))}
                 />
                 <Select
                   label="Example state"
@@ -326,6 +356,8 @@ function PlaygroundApp() {
             ? "spacious"
             : "comfortable"
       }
+      shape={pick(params.get("shape"), SHAPE_OPTIONS, "soft")}
+      surface={pick(params.get("surface"), SURFACE_OPTIONS, "bordered")}
     >
       {Template ? (
         <Suspense

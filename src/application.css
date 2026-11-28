@@ -28,7 +28,7 @@
     gap: 10px;
     padding: 10px;
     border: 1px solid var(--m-line);
-    border-radius: 10px;
+    border-radius: calc(var(--m-radius) * 1.25);
     background: var(--m-surface);
     text-decoration: none;
   }
@@ -46,7 +46,7 @@
     width: 22px;
     height: 22px;
     flex-shrink: 0;
-    border-radius: 5px;
+    border-radius: calc(var(--m-radius) * 0.625);
     background: var(--m-primary);
   }
   :is(.m-sidebar, .m-mobile-sidebar, .m-sidebar-panel) nav {
@@ -627,13 +627,15 @@
     border: 0;
     border-radius: 0;
     background: transparent;
+    box-shadow: none;
     overflow: visible;
   }
   .m-metrics[data-variant="cards"] > div,
   .m-metrics[data-variant="cards"] > div:last-child {
-    border: 1px solid var(--m-line);
+    border: var(--m-card-border, 1px solid var(--m-line));
     border-radius: var(--m-radius-lg);
-    background: var(--m-surface);
+    background: var(--m-card-fill, var(--m-surface));
+    box-shadow: var(--m-card-shadow, none);
   }
   /* Metric changes and activity dots read the status tone from data-tone;
      without one they use the secondary colour. */
@@ -685,7 +687,7 @@
     min-width: var(--m-control);
     min-height: var(--m-control);
     padding: 0 8px;
-    border-radius: var(--m-radius);
+    border-radius: var(--m-radius-control, var(--m-radius));
     color: var(--m-secondary);
     font-size: var(--m-font-size);
     font-weight: var(--m-weight-semibold);
@@ -1841,7 +1843,7 @@
     max-height: 32rem;
     padding: 1rem;
     border: 1px solid var(--m-line);
-    border-radius: 0.5rem;
+    border-radius: var(--m-radius);
     background: var(--m-sunken);
     font-size: 0.875rem;
     line-height: var(--m-leading-body);
@@ -1859,7 +1861,7 @@
     width: 100%;
     height: 36rem;
     border: 1px solid var(--m-line);
-    border-radius: 0.5rem;
+    border-radius: var(--m-radius);
     background: var(--m-paper);
   }
 }
