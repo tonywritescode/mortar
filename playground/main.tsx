@@ -34,6 +34,8 @@ const BrandBuilder = lazy(() =>
 const EmailPreview = lazy(() =>
   import("./email-preview.js").then((m) => ({ default: m.EmailPreview })),
 );
+// Not in the preview toolbar: an extra row there moves every preview. Try
+// them in the brand builder, or with ?shape= and ?surface= on any page.
 const SHAPE_OPTIONS = ["soft", "square", "round", "pill"] as const;
 const SURFACE_OPTIONS = ["bordered", "raised", "flat"] as const;
 /** A URL value if it is one of the options, else the default. */
@@ -188,24 +190,6 @@ function Playground({
                     { value: "spacious", label: "Spacious" },
                   ]}
                   onChange={(e) => navigate(url("density", e.target.value))}
-                />
-                <Select
-                  label="Shape"
-                  value={params.get("shape") || "soft"}
-                  options={SHAPE_OPTIONS.map((value) => ({
-                    value,
-                    label: value[0].toUpperCase() + value.slice(1),
-                  }))}
-                  onChange={(e) => navigate(url("shape", e.target.value))}
-                />
-                <Select
-                  label="Surface"
-                  value={params.get("surface") || "bordered"}
-                  options={SURFACE_OPTIONS.map((value) => ({
-                    value,
-                    label: value[0].toUpperCase() + value.slice(1),
-                  }))}
-                  onChange={(e) => navigate(url("surface", e.target.value))}
                 />
                 <Select
                   label="Example state"

@@ -37,6 +37,8 @@ export const isBrandParam = (key: string) =>
   key === "name" ||
   key === "font" ||
   key === "font-heading" ||
+  key === "brand-shape" ||
+  key === "brand-surface" ||
   /^[ld]-[a-z-]+$/.test(key);
 /** Keys that choose what the page shows; choosing one clears the others. */
 const PLACES = [
