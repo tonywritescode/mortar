@@ -340,3 +340,124 @@ test("brand emphasis font and style join the contract and default to today's loo
   assert.match(tokens, /--m-brand-font-emphasis: initial;/);
   assert.match(tokens, /--m-brand-font-emphasis-style: initial;/);
 });
+
+// Shape and surface: presets on the brand or ThemeProvider, written as
+// attributes, so every product built from the kit need not share one silhouette.
+test("ThemeProvider writes the shape and surface, from its props or the brand", () => {
+  const attrs = (props) =>
+    html(ThemeProvider, { scope: "container", ...props }, "Hi")
+      .match(/data-mortar-shape="([a-z]+)" data-mortar-surface="([a-z]+)"/)
+      ?.slice(1);
+  assert.deepEqual(attrs({}), ["soft", "bordered"]);
+  assert.deepEqual(
+    attrs({
+      brand: "acme",
+      brandTokens: { ...acme, shape: "pill", surface: "raised" },
+    }),
+    ["pill", "raised"],
+  );
+  // The props win over the brand.
+  assert.deepEqual(
+    attrs({
+      brand: "acme",
+      brandTokens: { shape: "pill", surface: "raised" },
+      shape: "square",
+      surface: "flat",
+    }),
+    ["square", "flat"],
+  );
+  // Brand CSS carries colours and fonts only.
+  assert.doesNotMatch(brandToCss("acme", { shape: "pill" }), /pill|radius/);
+});
+
+test("a shape or surface that is not a preset throws", () => {
+  for (const props of [
+    { shape: "rounded" },
+    { surface: "shadow" },
+    { brandTokens: { shape: "</style>" } },
+    { brandTokens: { surface: 1 } },
+  ])
+    assert.throws(
+      () => html(ThemeProvider, { scope: "container", ...props }, "Hi"),
+      /Invalid Mortar (shape|surface): .* Use "/,
+      JSON.stringify(props),
+    );
+});
+
+test("every shape preset declares the whole radius scale; soft matches the defaults", async () => {
+  const css = await readSource("src/tokens.css");
+  const scale = [
+    "m-radius-xs",
+    "m-radius-sm",
+    "m-radius",
+    "m-radius-lg",
+    "m-radius-xl",
+  ];
+  const root = customProperties(selectorBody(css, ":root"));
+  const preset = (shape) => {
+    // round and pill share a rule; pill then adds the control radius.
+    const own = customProperties(
+      selectorBody(css, `[data-mortar-shape="${shape}"]`),
+    );
+    return shape === "pill"
+      ? {
+          ...customProperties(selectorBody(css, '[data-mortar-shape="round"]')),
+          ...own,
+        }
+      : own;
+  };
+  for (const shape of ["soft", "square", "round", "pill"])
+    for (const token of [...scale, "m-radius-control"])
+      assert.ok(preset(shape)[token], `${shape} sets --${token}`);
+  for (const token of scale)
+    assert.equal(preset("soft")[token], root[token], token);
+  for (const token of scale)
+    assert.equal(preset("square")[token], "0px", token);
+  assert.equal(preset("pill")["m-radius-control"], "var(--m-radius-full)");
+  for (const shape of ["soft", "square", "round"])
+    assert.equal(preset(shape)["m-radius-control"], "initial", shape);
+});
+
+test("every surface preset declares each card token, and inverse bands switch the fill", async () => {
+  const css = await readSource("src/tokens.css");
+  const tokens = [
+    "m-card-border",
+    "m-card-fill",
+    "m-inv-card-fill",
+    "m-card-shadow",
+  ];
+  for (const surface of ["bordered", "raised", "flat"]) {
+    const body = customProperties(
+      selectorBody(css, `[data-mortar-surface="${surface}"]`),
+    );
+    assert.deepEqual(Object.keys(body).sort(), [...tokens].sort(), surface);
+  }
+  const bordered = customProperties(
+    selectorBody(css, '[data-mortar-surface="bordered"]'),
+  );
+  for (const token of tokens) assert.equal(bordered[token], "initial", token);
+  assert.equal(
+    customProperties(selectorBody(css, '[data-tone="inverse"]'))["m-card-fill"],
+    "var(--m-inv-card-fill)",
+  );
+});
+
+test("content cards read the surface tokens with today's look as the fallback", async () => {
+  const sheets = await Promise.all(
+    ["foundation", "application", "data", "marketing", "docs"].map((f) =>
+      readSource(`src/${f}.css`),
+    ),
+  );
+  const all = sheets.join("\n");
+  // Every card border that follows the surface falls back to the plain line.
+  const reads = all.match(/var\(--m-card-border, 1px solid var\(--m-line\)\)/g);
+  assert.ok(reads.length >= 8, `${reads.length} cards read --m-card-border`);
+  assert.doesNotMatch(all, /var\(--m-card-border\)/);
+  assert.doesNotMatch(all, /var\(--m-card-shadow\)(?!,)/);
+  // Floating surfaces keep their own style.
+  const floating = sheets[0].match(
+    /\/\* Floating surfaces[^*]*\*\/\s*:where\([^)]*\)\s*\{([^}]*)\}/,
+  )?.[1];
+  assert.match(floating, /border: 1px solid var\(--m-line\)/);
+  assert.doesNotMatch(floating, /--m-card/);
+});
