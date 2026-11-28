@@ -425,6 +425,67 @@
   --m-font-size: 15px;
   --m-row-pad: 18px;
 }
+/* Shape: the radius scale. soft is the default above. Every preset declares
+   the whole scale, so a nested provider never mixes two shapes. pill keeps
+   round surfaces and fully rounds controls (buttons, fields, segmented
+   controls, pill tabs and pagination) through --m-radius-control. Controls
+   read var(--m-radius-control, var(--m-radius)), so a container that sets
+   only --m-radius still reshapes its controls. */
+[data-mortar-shape="soft"] {
+  --m-radius-xs: 2px;
+  --m-radius-sm: 4px;
+  --m-radius: 8px;
+  --m-radius-lg: 12px;
+  --m-radius-xl: 16px;
+  --m-radius-control: initial;
+}
+[data-mortar-shape="square"] {
+  --m-radius-xs: 0px;
+  --m-radius-sm: 0px;
+  --m-radius: 0px;
+  --m-radius-lg: 0px;
+  --m-radius-xl: 0px;
+  --m-radius-control: initial;
+}
+[data-mortar-shape="round"],
+[data-mortar-shape="pill"] {
+  --m-radius-xs: 4px;
+  --m-radius-sm: 8px;
+  --m-radius: 12px;
+  --m-radius-lg: 20px;
+  --m-radius-xl: 28px;
+  --m-radius-control: initial;
+}
+[data-mortar-shape="pill"] {
+  --m-radius-control: var(--m-radius-full);
+}
+/* Surface: how content cards (Card, tables, lists, pricing plans,
+   testimonials, metric cards …) stand off the page. bordered is the default:
+   a line on the surface colour. raised adds a soft shadow under the line. flat
+   drops the line (kept transparent, so forced-colours mode still draws it) and
+   fills with the recessed colour. Floating surfaces (dialogs, menus, toasts)
+   are unaffected. Cards read var(--m-card-*, default), so these are inherited
+   and the nearest provider wins. The fill is resolved here per appearance; an
+   inverse band switches to --m-inv-card-fill (see the inverse tone below). */
+[data-mortar-surface="bordered"] {
+  --m-card-border: initial;
+  --m-card-fill: initial;
+  --m-inv-card-fill: initial;
+  --m-card-shadow: initial;
+}
+[data-mortar-surface="raised"] {
+  --m-card-border: initial;
+  --m-card-fill: initial;
+  --m-inv-card-fill: initial;
+  --m-card-shadow:
+    0 1px 2px rgb(0 0 0 / 0.06), 0 8px 24px -12px rgb(0 0 0 / 0.18);
+}
+[data-mortar-surface="flat"] {
+  --m-card-border: 1px solid transparent;
+  --m-card-fill: var(--m-sunken);
+  --m-inv-card-fill: var(--m-inv-sunken);
+  --m-card-shadow: initial;
+}
 @media (pointer: coarse) {
   [data-mortar] {
     --m-control: 44px;
@@ -459,6 +520,7 @@
   --m-focus: var(--m-inv-focus);
   --m-link: var(--m-inv-link);
   --m-band: var(--m-inv-paper);
+  --m-card-fill: var(--m-inv-card-fill);
 }
 
 /* Accent wash for the accent hover and active states: the on-accent colour

@@ -1259,8 +1259,10 @@
     break-inside: avoid;
     margin: 0 0 16px;
     padding: 24px;
-    border: 1px solid var(--m-line);
+    border: var(--m-card-border, 1px solid var(--m-line));
     border-radius: var(--m-radius-lg);
+    background: var(--m-card-fill, transparent);
+    box-shadow: var(--m-card-shadow, none);
   }
   .m-testimonial-grid blockquote {
     margin: 0 0 20px;
@@ -1450,8 +1452,10 @@
     margin-top: 36px;
   }
   .m-pricing-grid article {
-    border: 1px solid var(--m-line);
+    border: var(--m-card-border, 1px solid var(--m-line));
     border-radius: var(--m-radius-lg);
+    background: var(--m-card-fill, transparent);
+    box-shadow: var(--m-card-shadow, none);
     padding: 28px;
     display: flex;
     flex-direction: column;
@@ -1535,7 +1539,10 @@
   .m-pricing-extra .m-price strong {
     font-size: 32px;
   }
+  /* The featured plan keeps its line under every surface, so a flat grid
+     still sets it apart. */
   .m-pricing-grid article[data-featured="true"] {
+    border-color: var(--m-line);
     background: var(--m-surface);
     color: var(--m-ink);
   }
@@ -2161,8 +2168,10 @@
     display: grid;
     gap: 18px;
     padding: 28px;
-    border: 1px solid var(--m-line);
+    border: var(--m-card-border, 1px solid var(--m-line));
     border-radius: var(--m-radius-lg);
+    background: var(--m-card-fill, transparent);
+    box-shadow: var(--m-card-shadow, none);
   }
   .m-contact-media {
     min-height: 320px;
@@ -2363,7 +2372,7 @@
     flex: 1;
     min-width: 0;
     padding: 3px 10px;
-    border-radius: 6px;
+    border-radius: calc(var(--m-radius) * 0.75);
     background: var(--m-surface);
     color: var(--m-muted);
     font: 12px var(--m-mono);

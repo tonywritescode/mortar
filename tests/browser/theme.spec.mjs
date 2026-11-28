@@ -120,3 +120,160 @@ test("scale token overrides restyle components", async ({ page }) => {
     1,
   );
 });
+
+// Shape and surface presets: every corner and content card follows them, and
+// the nearest provider wins.
+const style = (page, selector, prop) =>
+  page
+    .locator(selector)
+    .first()
+    .evaluate((el, prop) => getComputedStyle(el).getPropertyValue(prop), prop);
+
+test("shape presets reshape surfaces and controls", async ({ page }) => {
+  const expected = {
+    soft: { control: "8px", card: "12px" },
+    square: { control: "0px", card: "0px" },
+    round: { control: "12px", card: "20px" },
+    pill: { control: "999px", card: "20px" },
+  };
+  for (const [shape, radius] of Object.entries(expected)) {
+    await page.goto(`/?component=Button&theme=light&shape=${shape}`);
+    await expect(page.locator("html")).toHaveAttribute(
+      "data-mortar-shape",
+      shape,
+    );
+    const button = '[data-mortar-preview="Button"] .m-button';
+    expect(await style(page, button, "border-top-left-radius"), shape).toBe(
+      radius.control,
+    );
+    await page.goto(`/?component=Card&theme=light&shape=${shape}`);
+    const card = '[data-mortar-preview="Card"] .m-card';
+    expect(await style(page, card, "border-top-left-radius"), shape).toBe(
+      radius.card,
+    );
+  }
+  // Textareas keep the surface radius under pill; the segmented control's
+  // inner buttons stay inside its outline.
+  await page.goto("/?component=TextArea&theme=light&shape=pill");
+  expect(
+    await style(
+      page,
+      '[data-mortar-preview="TextArea"] textarea',
+      "border-top-left-radius",
+    ),
+  ).toBe("12px");
+  await page.goto("/?component=SegmentedControl&theme=light&shape=square");
+  expect(
+    await style(
+      page,
+      '[data-mortar-preview="SegmentedControl"] .m-segmented button',
+      "border-top-left-radius",
+    ),
+  ).toBe("0px");
+});
+
+test("surface presets restyle content cards, not floating surfaces", async ({
+  page,
+}) => {
+  const card = '[data-mortar-preview="Card"] .m-card';
+  const read = async () => ({
+    border: await style(page, card, "border-top-color"),
+    shadow: await style(page, card, "box-shadow"),
+    background: await style(page, card, "background-color"),
+  });
+  const token = (name) =>
+    page.locator('[data-mortar-preview="Card"]').evaluate((el, name) => {
+      const probe = document.createElement("i");
+      probe.style.color = `var(${name})`;
+      el.append(probe);
+      const value = getComputedStyle(probe).color;
+      probe.remove();
+      return value;
+    }, name);
+  for (const theme of ["light", "dark"]) {
+    await page.goto(`/?component=Card&theme=${theme}`);
+    const bordered = await read();
+    expect(bordered.border).toBe(await token("--m-line"));
+    expect(bordered.shadow).toBe("none");
+    expect(bordered.background).toBe(await token("--m-surface"));
+
+    await page.goto(`/?component=Card&theme=${theme}&surface=raised`);
+    const raised = await read();
+    expect(raised.border).toBe(bordered.border);
+    expect(raised.shadow).not.toBe("none");
+
+    await page.goto(`/?component=Card&theme=${theme}&surface=flat`);
+    const flat = await read();
+    expect(flat.border).toBe("rgba(0, 0, 0, 0)");
+    expect(flat.shadow).toBe("none");
+    expect(flat.background).toBe(await token("--m-sunken"));
+    // Same box: the line stays, transparent, so nothing shifts.
+    expect(await style(page, card, "border-top-width")).toBe("1px");
+
+    // In an inverse band a flat card takes the band's recessed colour, and a
+    // nested provider's surface wins over the page's.
+    const [inverse, inverseSunken, nested] = await page
+      .locator('[data-mortar-preview="Card"]')
+      .evaluate((root) => {
+        root.insertAdjacentHTML(
+          "beforeend",
+          `<section data-tone="inverse" class="probe-inverse"><div class="m-card">A</div><i style="color: var(--m-sunken)"></i></section>
+           <div data-mortar-surface="bordered" class="probe-nested"><div class="m-card">B</div></div>`,
+        );
+        const bg = (s) =>
+          getComputedStyle(root.querySelector(s)).backgroundColor;
+        return [
+          bg(".probe-inverse .m-card"),
+          getComputedStyle(root.querySelector(".probe-inverse i")).color,
+          getComputedStyle(root.querySelector(".probe-nested .m-card"))
+            .borderTopColor,
+        ];
+      });
+    expect(inverse).toBe(inverseSunken);
+    expect(nested).not.toBe("rgba(0, 0, 0, 0)");
+  }
+  // Menus keep their floating style under every surface.
+  await page.goto("/?component=Dropdown&theme=light&surface=flat");
+  const trigger = page
+    .locator('[data-mortar-preview="Dropdown"]')
+    .getByRole("button")
+    .first();
+  await trigger.click();
+  const menu = page.locator(".m-menu").first();
+  await expect(menu).toBeVisible();
+  expect(
+    await menu.evaluate((el) => getComputedStyle(el).borderTopColor),
+  ).not.toBe("rgba(0, 0, 0, 0)");
+});
+
+// Every preset keeps the kit accessible, in both appearances.
+for (const [shape, surface] of [
+  ["pill", "raised"],
+  ["square", "flat"],
+])
+  for (const name of ["Pricing", "MetricGroup", "TestimonialGrid", "Input"])
+    for (const theme of ["light", "dark"])
+      test(`${name} ${shape}/${surface} ${theme} passes axe`, async ({
+        page,
+      }) => {
+        const { readFile } = await import("node:fs/promises");
+        const { mount, accessibility } = await import("../support/preview.mjs");
+        const { components } = JSON.parse(
+          await readFile(
+            new URL("../../catalog.json", import.meta.url),
+            "utf8",
+          ),
+        );
+        const component = components.find((c) => c.export === name);
+        const { errors } = await mount(page, component, {
+          theme,
+          shape,
+          surface,
+        });
+        await expect(page.locator("html")).toHaveAttribute(
+          "data-mortar-surface",
+          surface,
+        );
+        await accessibility(page, `[data-mortar-preview="${name}"]`);
+        expect(errors).toEqual([]);
+      });
