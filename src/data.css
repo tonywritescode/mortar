@@ -139,9 +139,10 @@
     table:where(:not([data-m-component], .m-prose [data-m-component] *)) {
     min-width: 0;
     overflow-x: auto;
-    border: 1px solid var(--m-line);
+    border: var(--m-card-border, 1px solid var(--m-line));
     border-radius: var(--m-radius-lg);
-    background: var(--m-surface);
+    background: var(--m-card-fill, var(--m-surface));
+    box-shadow: var(--m-card-shadow, none);
   }
   .m-table caption:not(.m-sr-only) {
     padding: 12px 14px 0;

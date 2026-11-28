@@ -8,7 +8,7 @@ Mortar's look comes from tokens in [`src/tokens.css`](../src/tokens.css), in thr
 
 Components only read the live `--m-*` tokens. Never style components directly; change tokens.
 
-## Choosing a brand, appearance and density
+## Choosing a brand, appearance, density, shape and surface
 
 ```tsx
 <ThemeProvider brand="green" initialAppearance="system" density="compact">
@@ -16,7 +16,7 @@ Components only read the live `--m-*` tokens. Never style components directly; c
 </ThemeProvider>
 ```
 
-ThemeProvider writes `data-mortar-brand`, `data-mortar-appearance` and `data-mortar-density` on the document root, or on a wrapper with `scope="container"`. Menus, listboxes and dialogs opened inside a container keep its theme. A container also mounts an overlay host: Modal and SlideOver `portal="contained"` render into that host so the backdrop and panel stay inside the wrapper (for embedded widgets) instead of covering the host page. The default `portal="document"` still uses the page-level dialog portal.
+ThemeProvider writes `data-mortar-brand`, `data-mortar-appearance`, `data-mortar-density`, `data-mortar-shape` and `data-mortar-surface` on the document root, or on a wrapper with `scope="container"`. Menus, listboxes and dialogs opened inside a container keep its theme. A container also mounts an overlay host: Modal and SlideOver `portal="contained"` render into that host so the backdrop and panel stay inside the wrapper (for embedded widgets) instead of covering the host page. The default `portal="document"` still uses the page-level dialog portal.
 
 ## Adding a brand
 
@@ -91,6 +91,40 @@ Text, line and status colours stay Mortar's, so a tinted surface is the brand's 
 ### Fonts
 
 `fonts: { body, heading }` (`--m-brand-font`, `--m-brand-font-heading`) are font-family lists, the same in light and dark. They apply wherever the brand does, including a container-scoped ThemeProvider. Headings (`h1`–`h6` inside Mortar) and component titles use the heading font; without one they keep the body font. Mortar loads no font files: load them in your app (for example with `@font-face` or your framework's font loader) and name them here. An entry may be a bare `var(--name)`, as framework font loaders such as `next/font` hand out (`var(--font-inter), system-ui, sans-serif`); a `var()` with a fallback, `url()` and `local()` are rejected.
+
+### Shape and surface
+
+Colour and fonts alone leave every brand with the same silhouette. `shape` and `surface` change it. Each is a short list of presets, tested in light, dark and inverse sections, so any combination stays accessible:
+
+| `shape`          | Corners                                                                                                   |
+| ---------------- | --------------------------------------------------------------------------------------------------------- |
+| `soft` (default) | 2, 4, 8, 12 and 16px across the radius scale                                                              |
+| `square`         | No rounding                                                                                               |
+| `round`          | 4, 8, 12, 20 and 28px: softer cards and panels                                                            |
+| `pill`           | `round`, plus fully rounded buttons, fields, segmented controls, pill tabs and pagination (not textareas) |
+
+| `surface`            | Content cards (Card, tables, lists, metric cards, pricing plans, testimonials, link cards …)                          |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `bordered` (default) | A line on the surface colour                                                                                          |
+| `raised`             | The line plus a soft shadow                                                                                           |
+| `flat`               | No line (it stays transparent, so forced-colours mode still outlines cards), filled with the recessed `sunken` colour |
+
+Dialogs, menus, popovers and toasts keep their own floating style under every surface. Set both on the brand, or on ThemeProvider, whose props win:
+
+```tsx
+<ThemeProvider
+  brand="acme"
+  brandTokens={{ light: { primary: "#1d4ed8" }, shape: "pill", surface: "raised" }}
+>
+```
+
+```tsx
+<ThemeProvider brand="acme" shape="square" surface="flat">
+```
+
+Any other value throws, like an invalid colour. `brandToCss`, `brandToStyle` and `registerBrand` carry colours and fonts only, so with those set `shape` and `surface` on ThemeProvider (or the `data-mortar-shape` and `data-mortar-surface` attributes yourself). A nested ThemeProvider uses its own shape and surface, not its parent's.
+
+Components read the shape through the radius scale and `--m-radius-control` (controls only, `pill`), and the surface through `--m-card-border`, `--m-card-fill` and `--m-card-shadow`. Don't set those on components; pick a preset.
 
 ### At runtime, from data
 
@@ -168,7 +202,7 @@ Mortar's own styles and the no-JavaScript appearance fallback are ordinary style
 
 ### With the brand builder
 
-The playground's [brand builder](https://mortar.tony.codes/playground/?page=brand) (`/playground/?page=brand`) designs a brand against this contract. Start from a preset, set the light and dark primary pairs, and open Advanced for the optional tokens, surfaces and accent gradient; empty fields show the value they derive. Set heading and body fonts below. Light and dark previews, each with an inverse band, an accent band, an accent button, a heading sample and overlays, update as you type, and a table checks contrast: 4.5:1 for text on primary, hover, active and accent, for links, text and muted text on page, surface and sunken, and for on-accent text on the accent fill (every gradient stop) at rest, hover and active; 3:1 for strong lines on page, surface and sunken, and for the focus ring. Copy the result as the CSS rule (from `brandToCss`) or as the `brandTokens` object. The brand is kept in the URL, so a link shares it.
+The playground's [brand builder](https://mortar.tony.codes/playground/?page=brand) (`/playground/?page=brand`) designs a brand against this contract. Start from a preset, set the light and dark primary pairs, and open Advanced for the optional tokens, surfaces and accent gradient; empty fields show the value they derive. Set heading and body fonts, and the shape and surface, below. Light and dark previews, each with an inverse band, an accent band, an accent button, a heading sample and overlays, update as you type, and a table checks contrast: 4.5:1 for text on primary, hover, active and accent, for links, text and muted text on page, surface and sunken, and for on-accent text on the accent fill (every gradient stop) at rest, hover and active; 3:1 for strong lines on page, surface and sunken, and for the focus ring. Copy the result as the CSS rule (from `brandToCss`) or as the `brandTokens` object. The brand is kept in the URL, so a link shares it. To see any playground page in another shape or surface, add `shape=` or `surface=` to its URL, for example `?recipe=pricing&shape=pill&surface=raised`.
 
 ## Marketing surfaces and illustrations
 
@@ -224,7 +258,7 @@ Override these on `:root` or on any container to retheme shape and rhythm:
 What follows the scales, and what does not:
 
 - **Weight:** every component font weight reads `--m-weight-*`.
-- **Radius:** every component corner that is 2, 4, 8, 12, 16 or 999px reads the matching `--m-radius-*` token. Circles (`50%`) and a few in-between sizes (5, 6, 7, 10 and 44px, and `0.5rem` in CodeBlock and PreviewFrame) stay fixed.
+- **Radius:** every component corner reads the radius scale: 2, 4, 8, 12, 16 and 999px corners read the matching `--m-radius-*` token, and in-between corners (5, 6, 7 and 10px, and CodeBlock and PreviewFrame) are fractions of `--m-radius`, so `shape` reshapes them too. Controls read `var(--m-radius-control, var(--m-radius))`. Circles (`50%`), the phone frame of MockWindow and chart marks stay fixed.
 - **Tracking:** display titles and big numbers read `--m-tracking-display`, headings `--m-tracking-heading`, uppercase labels `--m-tracking-caps`, and text that resets to normal reads `--m-tracking-body`. Titles tuned to other values, such as the hero's `-0.045em` or section titles' `-0.035em`, stay fixed.
 - **Leading:** display titles read `--m-leading-display`, testimonial quotes `--m-leading-heading`, and long-form text `--m-leading-body`. Other line heights stay fixed, including compact table and calendar text at 1.3, which does not follow `--m-leading-heading`.
 - **Space:** component padding, gaps and margins do not read `--m-space-*` yet. Use the space scale in your own layouts.
