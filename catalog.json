@@ -532,10 +532,6 @@
         "states": [],
         "probe": "navigation"
       },
-      "platforms": {
-        "swiftui": "MortarAppShell",
-        "compose": "MortarAppShell"
-      },
       "integrity": {
         "source": "2a20f135f533c6af6cb00e55a6702bf4caf60ceb480c78261b233cf5cb8809de",
         "preview": "89915465daa94583cd96e28864d7849128cfd6acae53df413b40d9d8e5554e34"
@@ -1024,10 +1020,6 @@
         "target": ".m-avatar",
         "states": []
       },
-      "platforms": {
-        "swiftui": "MortarAvatar",
-        "compose": "MortarAvatar"
-      },
       "integrity": {
         "source": "90c12a9911268093aa0664c671742e4d5dc291adbd5c9e0e2a8ef5da884d3347",
         "preview": "d4010c5f272fc629f47deaca214674a7fddabc3b0755801a6980c463a5109634"
@@ -1083,10 +1075,6 @@
         "profile": "display",
         "target": ".m-badge",
         "states": []
-      },
-      "platforms": {
-        "swiftui": "MortarBadge",
-        "compose": "MortarBadge"
       },
       "integrity": {
         "source": "84b506a2e70f014efdfecb28f97591abc42562ff34a802129c0a629b514bcb24",
@@ -1604,10 +1592,6 @@
         "states": ["disabled", "loading"],
         "probe": "button"
       },
-      "platforms": {
-        "swiftui": "MortarButton",
-        "compose": "MortarButton"
-      },
       "integrity": {
         "source": "84b506a2e70f014efdfecb28f97591abc42562ff34a802129c0a629b514bcb24",
         "preview": "4441a68154bb48c930efe331184bb45bbdd0a4f1e1d7b200c968349dc3a593e1"
@@ -2011,10 +1995,6 @@
         "target": ".m-card",
         "states": []
       },
-      "platforms": {
-        "swiftui": "MortarCard",
-        "compose": "MortarCard"
-      },
       "integrity": {
         "source": "92b3fa30aaed10038355a0e07f3a0a559fe921686464f8f570db16285d635f23",
         "preview": "2441c6cd1d1885abead8aa02e773cf59d1bfc342224ca35e1935b3cafaf5ea46"
@@ -2254,9 +2234,6 @@
         "target": ".m-chat-preview",
         "states": []
       },
-      "platforms": {
-        "swiftui": "MortarConversation"
-      },
       "integrity": {
         "source": "77e89daeba9444ed370626478addfb7788076bc92592af8e7be273ff83c3700e",
         "preview": "7200041ffb0fbfc726a2fbfa67284cf0a265a2ad26bed46310519348334b10f1"
@@ -2492,10 +2469,6 @@
         "target": ".m-choice input",
         "states": ["disabled", "error"],
         "probe": "checkbox"
-      },
-      "platforms": {
-        "swiftui": "MortarCheckbox",
-        "compose": "MortarCheckbox"
       },
       "integrity": {
         "source": "84b506a2e70f014efdfecb28f97591abc42562ff34a802129c0a629b514bcb24",
@@ -3078,9 +3051,6 @@
         "target": ".m-composer",
         "probe": "composer",
         "states": ["error"]
-      },
-      "platforms": {
-        "swiftui": "MortarCommentComposer"
       },
       "integrity": {
         "source": "dd9af6adc61d70ff8eb8a5a8758f27595365a422be99df0cdb48eacccc883d87",
@@ -4037,10 +4007,6 @@
         "target": ".m-divider",
         "states": []
       },
-      "platforms": {
-        "swiftui": "MortarDivider",
-        "compose": "MortarDivider"
-      },
       "integrity": {
         "source": "92b3fa30aaed10038355a0e07f3a0a559fe921686464f8f570db16285d635f23",
         "preview": "f614b0a24a31291e11baf396a74f2de3a63b4c47a59a6cddb9b246746b548cef"
@@ -4338,10 +4304,6 @@
         "profile": "display",
         "target": ".m-empty",
         "states": []
-      },
-      "platforms": {
-        "swiftui": "MortarEmptyState",
-        "compose": "MortarEmptyState"
       },
       "integrity": {
         "source": "84b506a2e70f014efdfecb28f97591abc42562ff34a802129c0a629b514bcb24",
@@ -5380,10 +5342,6 @@
         "target": ".m-input-group input",
         "states": ["disabled", "error", "long"],
         "probe": "input"
-      },
-      "platforms": {
-        "swiftui": "MortarTextField",
-        "compose": "MortarTextField"
       },
       "integrity": {
         "source": "84b506a2e70f014efdfecb28f97591abc42562ff34a802129c0a629b514bcb24",
@@ -6807,10 +6765,6 @@
         "target": ".m-notice",
         "states": [],
         "probe": "notice"
-      },
-      "platforms": {
-        "swiftui": "MortarNotice",
-        "compose": "MortarNotice"
       },
       "integrity": {
         "source": "84b506a2e70f014efdfecb28f97591abc42562ff34a802129c0a629b514bcb24",
@@ -8366,10 +8320,6 @@
         "target": ".m-progress",
         "states": []
       },
-      "platforms": {
-        "swiftui": "MortarProgressBar",
-        "compose": "MortarProgressBar"
-      },
       "integrity": {
         "source": "90c12a9911268093aa0664c671742e4d5dc291adbd5c9e0e2a8ef5da884d3347",
         "preview": "40faade5d15da33583e7045cf243e60f308cab0a33cfba069ce2b02591e99a74"
@@ -8653,10 +8603,6 @@
         "target": ".m-radio-group",
         "states": ["error"],
         "probe": "radio"
-      },
-      "platforms": {
-        "swiftui": "MortarRadioGroup",
-        "compose": "MortarRadioGroup"
       },
       "integrity": {
         "source": "84b506a2e70f014efdfecb28f97591abc42562ff34a802129c0a629b514bcb24",
@@ -9188,10 +9134,6 @@
         "states": [],
         "probe": "segmented"
       },
-      "platforms": {
-        "swiftui": "MortarSegmentedControl",
-        "compose": "MortarSegmentedControl"
-      },
       "integrity": {
         "source": "4faeab032c70f28e06b6ffa6d68b8fd35e1b847d2bc7e241cde07a76e54b31b4",
         "preview": "8025399d251ee54bc9f5327b42538e03ebfcb251ae0dfe03dac3c38558329afa"
@@ -9265,9 +9207,6 @@
         "states": ["disabled", "error"],
         "probe": "select"
       },
-      "platforms": {
-        "swiftui": "MortarPicker"
-      },
       "integrity": {
         "source": "84b506a2e70f014efdfecb28f97591abc42562ff34a802129c0a629b514bcb24",
         "preview": "a62fd5be1e09ad7b6fd6655ffb2afb70f54afbded799ad7d64dab2d311771a74"
@@ -9338,9 +9277,6 @@
         "profile": "composite",
         "target": ".m-settings-section",
         "states": []
-      },
-      "platforms": {
-        "swiftui": "MortarFormSection"
       },
       "integrity": {
         "source": "2a20f135f533c6af6cb00e55a6702bf4caf60ceb480c78261b233cf5cb8809de",
@@ -9983,10 +9919,6 @@
         "target": ".m-stacked-list",
         "states": []
       },
-      "platforms": {
-        "swiftui": "MortarStackedList",
-        "compose": "MortarStackedList"
-      },
       "integrity": {
         "source": "8457e5f37fce8db976345c4f9380045ef0d501403f7574c590589ad78c454852",
         "preview": "58387621a2e01b9f12a74b0484440ccd6d86886bb32b7ae9d4b2b2d0532e7266"
@@ -10282,10 +10214,6 @@
         "target": ".m-switch",
         "states": ["disabled"],
         "probe": "switch"
-      },
-      "platforms": {
-        "swiftui": "MortarSwitch",
-        "compose": "MortarSwitch"
       },
       "integrity": {
         "source": "84b506a2e70f014efdfecb28f97591abc42562ff34a802129c0a629b514bcb24",
@@ -10819,9 +10747,6 @@
         "target": ".m-field textarea",
         "states": ["disabled", "error", "long"],
         "probe": "textarea"
-      },
-      "platforms": {
-        "swiftui": "MortarTextEditor"
       },
       "integrity": {
         "source": "84b506a2e70f014efdfecb28f97591abc42562ff34a802129c0a629b514bcb24",
